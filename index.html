@@ -38,7 +38,6 @@
             border-radius: 6px;
             margin-bottom: 20px;
         }
-        /* 表格单独滚动容器，标题说明脱离滚动区域 */
         .table-scroll-box {
             overflow-x: auto;
         }
@@ -64,8 +63,12 @@
             max-width: 90px;
             height: auto;
             border-radius: 4px;
+            cursor: zoom-in;
+            transition: transform 0.2s ease;
         }
-        /* 前四列禁止自动换行 */
+        table img:hover {
+            transform: scale(1.05);
+        }
         table td:nth-child(1),
         table td:nth-child(2),
         table td:nth-child(3),
@@ -87,7 +90,33 @@
             display: none;
         }
 
-        /* 仅手机端适配，电脑完全不变 */
+        /* 图片放大弹窗样式 */
+        .img-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: zoom-out;
+        }
+
+        .img-modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 6px;
+            object-fit: contain;
+            cursor: grab;
+            transition: transform 0.1s ease;
+        }
+        .img-modal img:active {
+            cursor: grabbing;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 15px;
@@ -101,7 +130,6 @@
             table {
                 min-width: 720px;
             }
-            /* 加宽最后一列 恢复与校验纸张方法 */
             table th:last-child,
             table td:last-child {
                 min-width: 320px;
@@ -112,20 +140,16 @@
 </head>
 <body>
     <div class="wrap">
-        <!-- 标题、说明独立区域，不会跟随表格横向滚动 -->
         <h1>各品牌打印机型号设置方法收录大全 · 持续更新</h1>
         <div class="desc">
             说明：主要以标签打印机为主，可提供素材添加。
         </div>
-
-        <!-- 表格单独包裹滚动容器，只有表格会左右滑动 -->
         <div class="table-scroll-box">
             <div id="md-source">
 品牌 | 举例型号 | 图片 | 官网驱动地址 | 恢复与校验纸张方法
 ----- | ----- | ----- | ------ | ----- |
-TSC | 244 pro |  ![tsc](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/styles/product_selected_comparison/public/2021-03/ttp-244_500x500.png?itok=vL5VXRCv)  | [https://www.chinatsc.cn/zh-CN/downloads](https://www.chinatsc.cn/zh-CN/downloads) | 关机-长按暂停 然后开机 等出纸后 松开 【1】[碳带不回收](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/ttp-244-protandaibuhuishou.pdf)  【2】[244Pro 打印闪红灯/偏移解决方法](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/244prodayinshanhongdeng.pdf)  【3】[全系列机型打印闪红灯/偏移解决方法](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/quanxiliedayinshanhongdeng.pdf)
+TSC | 244 pro |  ![tsc](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/styles/product_selected_comparison/public/2021-03/ttp-244_500x500.png?itok=vL5VXRCv)  | [https://www.chinatsc.cn/zh-CN/downloads](https://www.chinatsc.cn/zh-CN/downloads) | 关机-长按暂停 然后开机 等出纸后 松开  【1】[碳带不回收](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/ttp-244-protandaibuhuishou.pdf)【2】[244Pro 打印闪红灯/偏移解决方法](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/244prodayinshanhongdeng.pdf)【3】[全系列机型打印闪红灯/偏移解决方法](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/quanxiliedayinshanhongdeng.pdf)
 SPRT 思普瑞特 | SP-TL21N | ![sprt](https://img.imgdd.com/b6bb2671-2c10-464d-a936-612dfcd1f51b.png) | [https://www.sprinter.com.cn/list-15-1.html](https://www.sprinter.com.cn/list-15-1.html) | 进入自检测方式：关机状态下，按住【FEED】键，打开电源键，在听到“一低一高”的开机提示音后，等待打印机走纸后，松开【FEED】键，则打印出打印机的自检测试页。[说明书PDF](https://www.sprinter.com.cn/uploadfile/2024/1015/291671e5c283b05.pdf)
-
 
 
             </div>
@@ -133,9 +157,94 @@ SPRT 思普瑞特 | SP-TL21N | ![sprt](https://img.imgdd.com/b6bb2671-2c10-464d-
         </div>
     </div>
 
+    <div class="img-modal" id="imgModal">
+        <div class="img-box">
+            <img src="" alt="放大图片" id="modalImg">
+        </div>
+    </div>
+
     <script>
+        // markdown转表格
         const mdTxt = document.getElementById("md-source").innerText;
         document.getElementById("html-view").innerHTML = marked.parse(mdTxt);
+
+        // 图片缩放拖拽核心变量
+        const imgModal = document.getElementById('imgModal');
+        const modalImg = document.getElementById('modalImg');
+        let scale = 1;
+        const scaleStep = 0.15;
+        const maxScale = 5;
+        const minScale = 1;
+        let isDrag = false;
+        let startX, startY, moveX = 0, moveY = 0;
+
+        // 重置图片状态
+        function resetImgStatus() {
+            scale = 1;
+            moveX = 0;
+            moveY = 0;
+            modalImg.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+        }
+
+        // 打开弹窗
+        const tableImgs = document.querySelectorAll('#html-view table img');
+        tableImgs.forEach(img => {
+            img.addEventListener('click', function() {
+                resetImgStatus();
+                modalImg.src = this.src;
+                imgModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // 滚轮缩放
+        imgModal.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                scale = Math.min(scale + scaleStep, maxScale);
+            } else {
+                scale = Math.max(scale - scaleStep, minScale);
+            }
+            modalImg.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+        });
+
+        // 拖拽开始
+        modalImg.addEventListener('mousedown', function(e) {
+            isDrag = true;
+            startX = e.clientX - moveX;
+            startY = e.clientY - moveY;
+            modalImg.style.transition = 'none';
+        });
+
+        // 拖拽移动
+        document.addEventListener('mousemove', function(e) {
+            if (!isDrag) return;
+            moveX = e.clientX - startX;
+            moveY = e.clientY - startY;
+            modalImg.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+        });
+
+        // 拖拽结束
+        document.addEventListener('mouseup', function() {
+            isDrag = false;
+            modalImg.style.transition = 'transform 0.1s ease';
+        });
+
+        // 点击空白关闭弹窗
+        imgModal.addEventListener('click', function(e) {
+            if(e.target === imgModal) {
+                imgModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape' && imgModal.style.display === 'flex') {
+                imgModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
     </script>
 </body>
 </html>
