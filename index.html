@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打印机型号设置方法收录大全（持续更新）</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 30px;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            color: #222;
+            margin-bottom: 25px;
+        }
+        .desc {
+            color: #666;
+            font-size: 14px;
+            background: #f6f8fa;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        /* 表格单独滚动容器，标题说明脱离滚动区域 */
+        .table-scroll-box {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        table th {
+            background-color: #f0f5ff;
+            font-weight: 600;
+            color: #333;
+        }
+        table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        table img {
+            max-width: 90px;
+            height: auto;
+            border-radius: 4px;
+        }
+        /* 前四列禁止自动换行 */
+        table td:nth-child(1),
+        table td:nth-child(2),
+        table td:nth-child(3),
+        table td:nth-child(4),
+        table th:nth-child(1),
+        table th:nth-child(2),
+        table th:nth-child(3),
+        table th:nth-child(4) {
+            white-space: nowrap;
+        }
+        table a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        table a:hover {
+            text-decoration: underline;
+        }
+        #md-source {
+            display: none;
+        }
+
+        /* 仅手机端适配，电脑完全不变 */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            .wrap {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            table {
+                min-width: 720px;
+            }
+            /* 加宽最后一列 恢复与校验纸张方法 */
+            table th:last-child,
+            table td:last-child {
+                min-width: 320px;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <!-- 标题、说明独立区域，不会跟随表格横向滚动 -->
+        <h1>各品牌打印机型号设置方法收录大全 · 持续更新</h1>
+        <div class="desc">
+            说明：主要以标签打印机为主，可提供素材添加。
+        </div>
+
+        <!-- 表格单独包裹滚动容器，只有表格会左右滑动 -->
+        <div class="table-scroll-box">
+            <div id="md-source">
+品牌 | 举例型号 | 图片 | 官网驱动地址 | 恢复与校验纸张方法
+----- | ----- | ----- | ------ | ----- |
+TSC | 244 pro |  ![tsc](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/styles/product_selected_comparison/public/2021-03/ttp-244_500x500.png?itok=vL5VXRCv)  | [https://www.chinatsc.cn/zh-CN/downloads](https://www.chinatsc.cn/zh-CN/downloads) | 关机-长按暂停 然后开机 等出纸后 松开 【1】[碳带不回收](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/ttp-244-protandaibuhuishou.pdf)  【2】[244Pro 打印闪红灯/偏移解决方法](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/244prodayinshanhongdeng.pdf)  【3】[全系列机型打印闪红灯/偏移解决方法](https://www.chinatsc.cn/sites/www.chinatsc.cn/files/users/user1378/quanxiliedayinshanhongdeng.pdf)
+SPRT 思普瑞特 | SP-TL21N | ![sprt](https://img.imgdd.com/b6bb2671-2c10-464d-a936-612dfcd1f51b.png) | [https://www.sprinter.com.cn/list-15-1.html](https://www.sprinter.com.cn/list-15-1.html) | 进入自检测方式：关机状态下，按住【FEED】键，打开电源键，在听到“一低一高”的开机提示音后，等待打印机走纸后，松开【FEED】键，则打印出打印机的自检测试页。[说明书PDF](https://www.sprinter.com.cn/uploadfile/2024/1015/291671e5c283b05.pdf)
+
+
+
+            </div>
+            <div id="html-view"></div>
+        </div>
+    </div>
+
+    <script>
+        const mdTxt = document.getElementById("md-source").innerText;
+        document.getElementById("html-view").innerHTML = marked.parse(mdTxt);
+    </script>
+</body>
+</html>
